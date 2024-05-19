@@ -6,7 +6,7 @@ use serde::Serialize;
 use serde_wasm_bindgen::to_value;
 
 #[wasm_bindgen]
-pub fn get_dominant_color(data: &[u8]) -> JsValue {
+pub fn extract_palette(data: &[u8]) -> JsValue {
     let img = image::load_from_memory(data).unwrap();
     let (width, height) = img.dimensions();
 
