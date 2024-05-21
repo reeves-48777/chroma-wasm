@@ -6,7 +6,7 @@ use serde::Serialize;
 use serde_wasm_bindgen::to_value;
 
 #[wasm_bindgen]
-pub fn extract_palette(data: &[u8]) -> JsValue {
+pub fn extract_palette(data: &[u8], n_colors: usize) -> JsValue {
     let img = image::load_from_memory(data).unwrap();
     let (width, height) = img.dimensions();
 
@@ -21,7 +21,7 @@ pub fn extract_palette(data: &[u8]) -> JsValue {
     let mut sorted_colors: Vec<_> = color_count.iter().collect();
     sorted_colors.sort_by(|a,b| b.1.cmp(a.1));
 
-    let top_colors: Vec<(u8, u8, u8)> = sorted_colors.iter().take(5).map(|(&color, _)| color).collect();
+    let top_colors: Vec<(u8, u8, u8)> = sorted_colors.iter().take(n_colors).map(|(&color, _)| color).collect();
 
     to_value(&top_colors).unwrap()
 }
