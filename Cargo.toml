@@ -1,5 +1,8 @@
 [package]
 name = "chroma-wasm"
+description = "Logic behind chroma color extraction from images"
+repository = "https://github.com/reeves-48777/chroma-wasm"
+license = "MIT"
 version = "0.1.0"
 edition = "2021"
 
