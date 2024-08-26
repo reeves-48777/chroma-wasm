@@ -1,5 +1,5 @@
 use image::Rgba;
-use palette::{ Lab, Srgb, Hsl, IntoColor, FromColor, rgb::Rgb, color_difference::EuclideanDistance};
+use palette::{ Lab, Srgb, Hsl, IntoColor, FromColor, color_difference::EuclideanDistance};
 use std::convert::From;
 use serde::Serialize;
 
