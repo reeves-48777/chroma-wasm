@@ -9,6 +9,22 @@ use rand::{seq::SliceRandom, SeedableRng, rngs::StdRng, Rng };
 pub mod color;
 pub use color::Color;
 
+#[wasm_bindgen]
+pub enum Algorithm {
+    KMeans,
+    KMeansPP
+}
+
+impl Algorithm {
+    pub fn from_str(s: &str) -> Option<Self> {
+        match s {
+            "KMeans" => Some(Algorithm::KMeans),
+            "KMeansPP" => Some(Algorithm::KMeansPP),
+            _ => None
+        }
+    }
+}
+
 fn k_means_pp(colors: &[Color], k: usize) -> Vec<Color> {
     let seed = [0u8; 32];
     let mut rng = StdRng::from_seed(seed);
@@ -75,16 +91,21 @@ fn k_means(colors: &[Color], k: usize, iterations: usize) -> Vec<Color> {
 }
 
 #[wasm_bindgen]
-pub fn extract_palette(data: &[u8], n_colors: usize, precision: Option<usize>, n_size: Option<u32>) -> JsValue {
+pub fn extract_palette(data: &[u8], n_colors: usize, algorithm: Option<String>, precision: Option<usize>, n_size: Option<u32> ) -> JsValue {
     let precision = precision.or(Some(12)).unwrap();
     let n_size = n_size.or(Some(100)).unwrap();
+    let algorithm = Algorithm::from_str(&algorithm.or(Some("KMeans".to_string())).unwrap()).expect("Invalid algorithm");
 
     let img = image::load_from_memory(data).expect("Failed to load image");
 
     let downsampled = img.resize(n_size, n_size, image::imageops::FilterType::Triangle);
     let colors: Vec<Color> = downsampled.to_rgba8().pixels().map(|p| Color::from(*p)).collect();
     
-    let palette: Vec<Color> = k_means(&colors, n_colors, precision).iter().take(n_colors).map(|&c| c).collect();
+    // let palette: Vec<Color> = k_means(&colors, n_colors, precision).iter().take(n_colors).map(|&c| c).collect();
+    let palette: Vec<Color> = match algorithm {
+        Algorithm::KMeans => k_means(&colors, n_colors, precision).iter().take(n_colors).map(|&c| c).collect(),
+        Algorithm::KMeansPP => k_means_pp(&colors, n_colors).iter().take(n_colors).map(|&c| c).collect(),
+    };
 
     to_value(&palette).unwrap()
 }
